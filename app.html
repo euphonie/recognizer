@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Recognizing Handwritten Digits</title>
+		<link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+		<style type="text/css">
+		html, body {
+		    margin: 0;
+		    width: 100%;
+		    height: 100%;
+		}
+		.pad-container {
+			padding-top:10px;
+			width:100%;
+			height:95%;
+		}
+		.quick-nav {
+			width:100%;
+			text-align:center;
+			padding-top:5px;
+		}
+		.quick-nav a {
+			color:#333333;
+		}
+		.app-container {
+			width:100%;
+			height:100%;
+		    background-image: -moz-linear-gradient(top, #EEEEEE, #DDDDDD);
+		    background-image: -ms-linear-gradient(top, #EEEEEE, #DDDDDD);
+		    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EEEEEE), to(#DDDDDD));
+		    background-image: -webkit-linear-gradient(top, #EEEEEE, #DDDDDD);
+		    background-image: -o-linear-gradient(top, #EEEEEE, #DDDDDD);
+		    background-image: linear-gradient(top, #EEEEEE, #DDDDDD);
+		    background-repeat: repeat-x;
+		}
+		.navbar-inner {
+		    background-image: -moz-linear-gradient(top, #FFFFFF, #EEEEEE);
+		    background-image: -ms-linear-gradient(top, #FFFFFF, #EEEEEE);
+		    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FFFFFF), to(#EEEEEE));
+		    background-image: -webkit-linear-gradient(top, #FFFFFF, #EEEEEE);
+		    background-image: -o-linear-gradient(top, #FFFFFF, #EEEEEE);
+		    background-image: linear-gradient(top, #FFFFFF, #EEEEEE);
+		    background-repeat: repeat-x;
+		}
+		.container {
+			border-bottom:1px solid gray;
+		}
+		.numberChoice {
+			background-color:#DDDDDD;
+			color:black;
+			padding:10px;
+			width:20px;
+			height:40px;
+			font-weight:bold;
+			font-size:25px;
+			display:inline;
+		}
+		.numberChoice:hover {
+			background-color:#EEEEEE;
+		}
+		form {
+			margin:0px 0px 0px 0px;
+		}
+		#status {
+			text-align:right;
+			margin-right:2%;
+			color:#777777;
+		}
+		.top, .directions {
+			text-align:center;
+		}
+		.digit-container {
+			width:400px;
+			height:100px;
+			margin-left:auto;
+			margin-right:auto;
+			cursor:pointer;
+		}
+		</style>		
+		<script src="http://code.jquery.com/jquery.min.js"></script>
+		<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+		<script src="http://cloud.github.com/downloads/harthur/brain/brain-0.6.0.js"></script>
+		<script>
+		// handwriting.js - training a neural network to recognize handwritten digits
+		// (c) 2013 Amit Mizrahi
+		// thanks to @harthur for brain.js
+		
+		$(function() {
+		
+		// initialize training data
+		
+		window.trainingData = {};
+		
+		// make references to the canvas objects for later
+		
+		var trainingCtx = $("#train")[0].getContext("2d");
+		var testingCtx = $("#test")[0].getContext("2d");
+		
+		// hiding the testing canvas until testing phase
+				
+		$("#test").hide();
+			
+		// initializing the canvas for training images
+			
+		/* TRAINING PHASE */
+		
+		// grab a random image and draw it to the training canvas
+		
+		var genRandomImage = function() {
+			$.get('/random', function(data) {
+				// a get request to "/random" should return a url to an image
+				var img = new Image();
+				img.src = data;
+				trainingCtx.drawImage(img, 0, 0);
+			});
+		}
+		
+		genRandomImage();
+		
+		// function for refreshing the canvas (should be called from addImageData)
+		
+		var canvasRefresh = function() {
+			
+		}
+		
+		// get the image rgba data, isolate the alpha values (1 for black pixel, 0 for white pixel), and add to the training data (+ user choice)
+		
+		var addImageData = function(userInput) {
+			var alphaData = [];
+			var imgData = trainingCtx.getImageData(0, 0, 200, 200).data;
+			// get every 4th value
+			for(var i = 3; i < imgData.length; i += 4) {
+				if(imgData[i] === 255) {
+					alphaData.push(1); // add 1 to the alphaData array if pixel is black
+				}
+				else if(imgData[i] === 0) {
+					alphaData.push(0); // add 0 to the alphaData array if pixel is white
+				}
+				else {
+					console.log("Non-black-white character ignoring. Assuming white.");
+					alphaData.push(0);
+				}
+			}
+			var ioHash = {input: alphaData, output: {userInput: 1}};
+			window.trainingData.push(ioHash);
+		}
+		
+		// listen for user clicking one of the digit choices, get the choice and apply addImageData
+		
+		$(".numberChoice").click(function() {
+			var numberChosen = $(this).attr('data-number');
+			addImageData(numberChosen);
+		});
+		
+		});
+		</script>
+	</head>
+	<body>
+		<div class="app-container">
+			<div class="pad-container">
+				<h1 class="top">Recognizing Handwritten Digits</h1>
+				<p class="directions">Start giving the neural network some training data, then click "Train" once you're finished.</p>
+				<br/>
+				<p class="directions"><i>What is this digit?</i></p>
+				<div class="canvas-container">
+					<canvas id="train" width="200" height="200"></canvas>
+					<canvas id="test" width="200" height="200"></canvas>
+				</div>
+				<div class="digit-container">
+					<div class="numberChoice" data-number="1">1</div>
+					<div class="numberChoice" data-number="2">2</div>
+					<div class="numberChoice" data-number="3">3</div>
+					<div class="numberChoice" data-number="4">4</div>
+					<div class="numberChoice" data-number="5">5</div>
+					<div class="numberChoice" data-number="6">6</div>
+					<div class="numberChoice" data-number="7">7</div>
+					<div class="numberChoice" data-number="8">8</div>
+					<div class="numberChoice" data-number="9">9</div>
+					<div class="numberChoice" data-number="0">0</div>
+				</div>
+				<p class="directions">&copy; 2013 Amit Mizrahi. <a href="#" id="privacy">Privacy</a> &middot; <a href="#" id="about">About</a></p>
+			</div>
+		</div>
+	</body>
+</html>
