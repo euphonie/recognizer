@@ -120,7 +120,8 @@
 		// function for refreshing the canvas (should be called from addImageData)
 		
 		var canvasRefresh = function() {
-			
+			trainingCtx.clearRect(0, 0, 200, 200);
+			genRandomImage();
 		}
 		
 		// get the image rgba data, isolate the alpha values (1 for black pixel, 0 for white pixel), and add to the training data (+ user choice)
@@ -143,6 +144,7 @@
 			}
 			var ioHash = {input: alphaData, output: {userInput: 1}};
 			window.trainingData.push(ioHash);
+			canvasRefresh();
 		}
 		
 		// listen for user clicking one of the digit choices, get the choice and apply addImageData
