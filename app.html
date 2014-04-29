@@ -1,187 +1,286 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Recognizing Handwritten Digits</title>
-		<link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
-		<style type="text/css">
-		html, body {
-		    margin: 0;
-		    width: 100%;
-		    height: 100%;
-		}
-		.pad-container {
-			padding-top:10px;
-			width:100%;
-			height:95%;
-		}
-		.quick-nav {
-			width:100%;
-			text-align:center;
-			padding-top:5px;
-		}
-		.quick-nav a {
-			color:#333333;
-		}
-		.app-container {
-			width:100%;
-			height:100%;
-		    background-image: -moz-linear-gradient(top, #EEEEEE, #DDDDDD);
-		    background-image: -ms-linear-gradient(top, #EEEEEE, #DDDDDD);
-		    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EEEEEE), to(#DDDDDD));
-		    background-image: -webkit-linear-gradient(top, #EEEEEE, #DDDDDD);
-		    background-image: -o-linear-gradient(top, #EEEEEE, #DDDDDD);
-		    background-image: linear-gradient(top, #EEEEEE, #DDDDDD);
-		    background-repeat: repeat-x;
-		}
-		.navbar-inner {
-		    background-image: -moz-linear-gradient(top, #FFFFFF, #EEEEEE);
-		    background-image: -ms-linear-gradient(top, #FFFFFF, #EEEEEE);
-		    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FFFFFF), to(#EEEEEE));
-		    background-image: -webkit-linear-gradient(top, #FFFFFF, #EEEEEE);
-		    background-image: -o-linear-gradient(top, #FFFFFF, #EEEEEE);
-		    background-image: linear-gradient(top, #FFFFFF, #EEEEEE);
-		    background-repeat: repeat-x;
-		}
-		.container {
-			border-bottom:1px solid gray;
-		}
-		.numberChoice {
-			background-color:#DDDDDD;
-			color:black;
-			padding:10px;
-			width:20px;
-			height:40px;
-			font-weight:bold;
-			font-size:25px;
-			display:inline;
-		}
-		.numberChoice:hover {
-			background-color:#EEEEEE;
-		}
-		form {
-			margin:0px 0px 0px 0px;
-		}
-		#status {
-			text-align:right;
-			margin-right:2%;
-			color:#777777;
-		}
-		.top, .directions {
-			text-align:center;
-		}
-		.digit-container {
-			width:400px;
-			height:100px;
-			margin-left:auto;
-			margin-right:auto;
-			cursor:pointer;
-		}
-		</style>		
-		<script src="http://code.jquery.com/jquery.min.js"></script>
-		<script src="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-		<script src="http://cloud.github.com/downloads/harthur/brain/brain-0.6.0.js"></script>
-		<script>
-		// handwriting.js - training a neural network to recognize handwritten digits
-		// (c) 2013 Amit Mizrahi
-		// thanks to @harthur for brain.js
-		
-		$(function() {
-		
-		// initialize training data
-		
-		window.trainingData = {};
-		
-		// make references to the canvas objects for later
-		
-		var trainingCtx = $("#train")[0].getContext("2d");
-		var testingCtx = $("#test")[0].getContext("2d");
-		
-		// hiding the testing canvas until testing phase
-				
-		$("#test").hide();
-			
-		// initializing the canvas for training images
-			
-		/* TRAINING PHASE */
-		
-		// grab a random image and draw it to the training canvas
-		
-		var genRandomImage = function() {
-			$.get('/random', function(data) {
-				// a get request to "/random" should return a url to an image
-				var img = new Image();
-				img.src = data;
-				trainingCtx.drawImage(img, 0, 0);
-			});
-		}
-		
-		genRandomImage();
-		
-		// function for refreshing the canvas (should be called from addImageData)
-		
-		var canvasRefresh = function() {
-			trainingCtx.clearRect(0, 0, 200, 200);
-			genRandomImage();
-		}
-		
-		// get the image rgba data, isolate the alpha values (1 for black pixel, 0 for white pixel), and add to the training data (+ user choice)
-		
-		var addImageData = function(userInput) {
-			var alphaData = [];
-			var imgData = trainingCtx.getImageData(0, 0, 200, 200).data;
-			// get every 4th value
-			for(var i = 3; i < imgData.length; i += 4) {
-				if(imgData[i] === 255) {
-					alphaData.push(1); // add 1 to the alphaData array if pixel is black
-				}
-				else if(imgData[i] === 0) {
-					alphaData.push(0); // add 0 to the alphaData array if pixel is white
-				}
-				else {
-					console.log("Non-black-white character ignoring. Assuming white.");
-					alphaData.push(0);
-				}
-			}
-			var ioHash = {input: alphaData, output: {userInput: 1}};
-			window.trainingData.push(ioHash);
-			canvasRefresh();
-		}
-		
-		// listen for user clicking one of the digit choices, get the choice and apply addImageData
-		
-		$(".numberChoice").click(function() {
-			var numberChosen = $(this).attr('data-number');
-			addImageData(numberChosen);
-		});
-		
-		});
-		</script>
-	</head>
-	<body>
-		<div class="app-container">
-			<div class="pad-container">
-				<h1 class="top">Recognizing Handwritten Digits</h1>
-				<p class="directions">Start giving the neural network some training data, then click "Train" once you're finished.</p>
-				<br/>
-				<p class="directions"><i>What is this digit?</i></p>
-				<div class="canvas-container">
-					<canvas id="train" width="200" height="200"></canvas>
-					<canvas id="test" width="200" height="200"></canvas>
-				</div>
-				<div class="digit-container">
-					<div class="numberChoice" data-number="1">1</div>
-					<div class="numberChoice" data-number="2">2</div>
-					<div class="numberChoice" data-number="3">3</div>
-					<div class="numberChoice" data-number="4">4</div>
-					<div class="numberChoice" data-number="5">5</div>
-					<div class="numberChoice" data-number="6">6</div>
-					<div class="numberChoice" data-number="7">7</div>
-					<div class="numberChoice" data-number="8">8</div>
-					<div class="numberChoice" data-number="9">9</div>
-					<div class="numberChoice" data-number="0">0</div>
-				</div>
-				<p class="directions">&copy; 2013 Amit Mizrahi. <a href="#" id="privacy">Privacy</a> &middot; <a href="#" id="about">About</a></p>
-			</div>
-		</div>
-	</body>
+  <head>
+    <title>Recognizing Handwritten Digits</title>
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <!-- Loading Flat UI -->
+    <link href="css/flat-ui.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <style type="text/css">
+      html, body {
+          margin: 0;
+          width: 100%;
+          height: 100%;
+          background-color:#ECF0F1;
+      }
+      .pad-container {
+        padding-top:10px;
+        width:100%;
+        height:95%;
+      }
+      .app-container {
+        width:100%;
+        height:100%;
+      }
+      .container {
+        border-bottom:1px solid gray;
+      }
+      .numberChoice {
+        padding:10px;
+        font-weight:bold;
+        font-size:25px;
+        display:inline;
+      }
+      .numberChoice:hover {
+        background-color:#EEEEEE;
+      }
+      #status {
+        text-align:right;
+        margin-right:2%;
+        color:#777777;
+      }
+      .top, .directions {
+        text-align:center;
+      }
+      .digit-container {
+        width:400px;
+        height:100px;
+        margin-left:auto;
+        margin-right:auto;
+        cursor:pointer;
+      }
+      #test{cursor: pointer;}
+      .center{}
+      #colors{margin:0;padding:0;float: left;}
+      #colors li{ height: 20px; width: 20px; display: block; cursor: pointer; }
+      #colors li.selected{ height: 18px; width: 18px; display: block; border: solid 1px #eee; }
+      .no-padding{padding:0;}
+      .lower-resolution{
+        width:200px;
+        height:200px;
+      }
+      label{float: left;}
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="pad-container">
+        <h1 class="top">Reconocimiento de Carácteres Escritos</h1>
+        <p class="directions">
+          Primera fase: Entrenamiento de red neural, then click "Train" once you're finished.
+        </p>
+        <br/>
+        <p class="directions"><i>Seleccionar qué número es:</i></p>
+        <div class="canvas-container tile">
+          <canvas class="well btn-info no-padding lower-resolution" id="train"></canvas>
+          <canvas class="well btn-info no-padding lower-resolution" id="test"></canvas>
+        </div>
+        <div class="tile">
+          <button class="btn btn-primary col-md-4 col-md-offset-4" id="clean">Reset</button>
+        </div>
+        <div class="digit-container" style="padding-top:20px">
+          <div class="numberChoice btn-primary" data-number="1">1</div>
+          <div class="numberChoice btn-primary" data-number="2">2</div>
+          <div class="numberChoice btn-primary" data-number="3">3</div>
+          <div class="numberChoice btn-primary" data-number="4">4</div>
+          <div class="numberChoice btn-primary" data-number="5">5</div>
+          <div class="numberChoice btn-primary" data-number="6">6</div>
+          <div class="numberChoice btn-primary" data-number="7">7</div>
+          <div class="numberChoice btn-primary" data-number="8">8</div>
+          <div class="numberChoice btn-primary" data-number="9">9</div>
+          <div class="numberChoice btn-primary" data-number="0">0</div>
+        </div>
+        <div class="tile" style="margin-top:40px">
+          <p class="train-elements"> Cantidad de elementos entrenados: <span class="training-count">0</span></p>
+          <button class="btn" id="returnTraining">
+            <span class="input-icon fui-arrow-left"></span>
+            Regresar a entrenamiento
+          </button>
+          <button class="btn" id="identify">
+            <span class="input-icon fui-check"></span>
+            Identificar carácter
+          </button>
+          <button class="btn btn-primary" id="reset">Reiniciar entrenamiento</button>
+          <button class="btn btn-success" id="stopTraining">Finalizar entrenamiento</button>
+        </div>
+      </div>
+    </div>
+    <script src="js/jquery-1.8.3.min.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="js/jquery.ui.touch-punch.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/bootstrap-switch.js"></script>
+    <script src="js/flatui-checkbox.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/jquery.tagsinput.js"></script>
+    <script src="js/jquery.placeholder.js"></script>
+    <script src="js/brain-0.6.3.js"></script>
+    <script src="js/freeDrawing.js"></script>
+    <script>
+    // handwriting.js - training a neural network to recognize handwritten digits
+    // (c) 2013 Amit Mizrahi
+    // thanks to @harthur for brain.js
+
+    $(function() {
+
+      canvas_side = 50;
+
+      // initialize training data
+
+      window.trainingData = [];
+
+      // Neural network
+      net = new brain.NeuralNetwork();
+
+
+      // make references to the canvas objects for later
+
+      trainingCtx = $("#train")[0].getContext("2d");
+      testingCtx = $("#test")[0].getContext("2d");
+
+      // hiding the testing canvas until testing phase
+
+      $("#test").hide();
+
+      // initializing the canvas for training images
+
+      /* TRAINING PHASE */
+
+      showElement = function(elm){
+        $(elm).removeClass('animated fadeOutUp');
+        $(elm).show();
+        $(elm).addClass('animated fadeInUp');
+      };
+
+      hideElement = function(elm, callback){
+        $(elm).removeClass('animated fadeInUp');
+        if (callback !== undefined){
+          $(elm).one(
+            'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+            callback();
+            $(elm).hide();
+          });
+        }else{
+          $(elm).one(
+            'webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+            $(elm).hide();
+          });
+        }
+        $(elm).addClass('animated fadeOutUp');
+      };
+
+      // grab a random image and draw it to the training canvas
+
+      var genRandomImage = function() {
+        $.get('/random', function(data) {
+          // a get request to "/random" should return a url to an image
+          var img = new Image();
+          img.src = data;
+          img.onload = function(){
+            trainingCtx.drawImage(img, 0, 0);
+          };
+        });
+      }
+
+      genRandomImage();
+
+      // function for refreshing the canvas (should be called from addImageData)
+
+      var canvasRefresh = function() {
+        trainingCtx.clearRect(0, 0, canvas_side, canvas_side);
+        genRandomImage();
+      }
+
+      // get the image rgba data, isolate the alpha values (1 for black pixel, 0 for white pixel), and add to the training data (+ user choice)
+
+      var addImageData = function(userInput) {
+        var alphaData = [];
+        var imgData = trainingCtx.getImageData(0, 0, canvas_side, canvas_side).data;
+        // get every 4th value
+        dataimage = imgData;
+        for(var i = 3; i < imgData.length; i += 4) {
+          if(imgData[i] === 255) {
+            alphaData.push(1); // add 1 to the alphaData array if pixel is black
+          }
+          else if(imgData[i] === 0) {
+            alphaData.push(0); // add 0 to the alphaData array if pixel is white
+          }
+          else {
+            console.log("Non-black-white character ignoring. Assuming white.");
+            alphaData.push(0);
+          }
+        }
+        parsedValue = {
+          '1':(1===parseInt(userInput) ? 1 : 0),
+          '2':(2===parseInt(userInput) ? 1 : 0),
+          '3':(3===parseInt(userInput) ? 1 : 0),
+          '4':(4===parseInt(userInput) ? 1 : 0),
+          '5':(5===parseInt(userInput) ? 1 : 0),
+          '6':(6===parseInt(userInput) ? 1 : 0),
+          '7':(7===parseInt(userInput) ? 1 : 0),
+          '8':(8===parseInt(userInput) ? 1 : 0),
+          '9':(9===parseInt(userInput) ? 1 : 0),
+          '0':(0===parseInt(userInput) ? 1 : 0)
+        };
+        var ioHash = {input: alphaData, output: parsedValue};
+        window.trainingData.push(ioHash);
+        canvasRefresh();
+      }
+
+      // listen for user clicking one of the digit choices, get the choice and apply addImageData
+
+      $(".numberChoice").click(function() {
+        var numberChosen = $(this).attr('data-number');
+        addImageData(numberChosen);
+        var currentCount = $('.training-count').text();
+        $('.training-count').text(parseInt(currentCount)+1)
+      });
+
+      $("#reset").click(function(){
+        trainingData = [];
+        $('.training-count').text(0)
+      });
+
+      animateStop = function(){
+        _callback =  function(){
+            hideElement('#train');
+            showElement('#test');
+            hideElement('#reset, #stopTraining, #train-elements');
+            showElement('#returnTraining, #clean, #identify');
+        };
+        hideElement('.digit-container', _callback);
+      }
+
+      $("#stopTraining").click(function(){
+        animateStop();
+        net.train(trainingData);
+      });
+
+      hideElement('#returnTraining, #clean, #identify');
+
+      $("#identify").click(function(){
+        var alphaData = [];
+        var imgData = testingCtx.getImageData(0, 0, canvas_side, canvas_side).data;
+        // get every 4th value
+        for(var i = 3; i < imgData.length; i += 4) {
+          if(imgData[i] === 255) {
+            alphaData.push(1); // add 1 to the alphaData array if pixel is black
+          }
+          else if(imgData[i] === 0) {
+            alphaData.push(0); // add 0 to the alphaData array if pixel is white
+          }
+          else {
+            console.log("Non-black-white character ignoring. Assuming white.");
+            alphaData.push(0);
+          }
+        }
+        var output = net.run(alphaData);
+        console.log(output);
+      });
+
+      //var output = net.run({ r: 1, g: 0.4, b: 0 });  // { white: 0.99, black: 0.002 }
+    });
+    </script>
+  </body>
 </html>

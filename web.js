@@ -8,20 +8,23 @@ var fs = require('fs');
 
 var app = express();
 
+
 app.engine('html', ejs.renderFile);
 app.set('views', __dirname);
+app.use(express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
   res.render('app.html');
 });
 
 app.get('/random', function(req, res) {
-	// get a random number between 1 and 64 (there are 64 files in the directory)
-	var fileNumber = Math.round(Math.random()*63) + 1;
-	fs.readFile(fileNumber+'.jpg', function(data) {
-		res.contentType('image/jpeg');
-		res.end(data, 'binary');
-	});
+  //process.stdout.write(__dirname+"/1.jpg");
+
+  var fileNumber = Math.round(Math.random()*27) + 1;
+  fs.readFile('/images/'+fileNumber+'.jpg', function(data) {
+    res.contentType('image/jpeg');
+    res.end('/images/'+fileNumber+'.jpg', 'binary');
+  });
 });
 
 app.listen(3000);
