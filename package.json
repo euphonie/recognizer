@@ -1,0 +1,19 @@
+{
+  "name": "handwriting",
+  "version": "0.0.0",
+  "description": "",
+  "main": "web.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bakedintime/recognizer.git"
+  },
+  "author": "Joel Cantoral & Ana Silvia Gonzalez",
+  "license": "ISC",
+  "homepage": "https://github.com/bakedintime/recognizer",
+  "dependencies": {
+    "ejs": "^1.0.0",
+    "express": "^4.1.0"
+  }
+}
