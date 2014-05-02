@@ -21,9 +21,9 @@ app.get('/random', function(req, res) {
   //process.stdout.write(__dirname+"/1.jpg");
 
   var fileNumber = Math.round(Math.random()*27) + 1;
-  fs.readFile('/images/'+fileNumber+'.jpg', function(data) {
-    res.contentType('image/jpeg');
-    res.end('/images/'+fileNumber+'.jpg', 'binary');
+  fs.readFile('/images/'+fileNumber+'.png', function(data) {
+    res.contentType('image/png');
+    res.end('/images/'+fileNumber+'.png', 'binary');
   });
 });
 
