@@ -6,7 +6,7 @@ function canvasInit(){
     //Fill it with white background
     context.save();
     context.fillStyle = '#fff';
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    context.fillRect(0, 0, canvas_side, canvas_side);
     context.restore();
 }
 
@@ -16,9 +16,8 @@ $(function(){
     //Get the canvas element
     canvas = document.getElementById("test");
     cntxt = canvas.getContext("2d");
-    top = 270;//$('#test').offset().top;
-    left = 540;// $('#test').offset().left;
-    canvasInit();
+    top = 270;
+    left = 540;
 
     //Drawing Code
     $('#test').mousedown(function(e){
