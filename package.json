@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "description": "",
   "main": "web.js",
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/bakedintime/recognizer.git"
@@ -13,7 +12,10 @@
   "license": "ISC",
   "homepage": "https://github.com/bakedintime/recognizer",
   "dependencies": {
+    "body-parser": "^1.0.2",
+    "brain": "^0.6.3",
     "ejs": "^1.0.0",
-    "express": "^4.1.0"
+    "express": "^4.1.0",
+    "http": "0.0.0"
   }
 }
