@@ -5,8 +5,8 @@ function canvasInit(){
     context.lineCap = "round";
     //Fill it with white background
     context.save();
-    context.fillStyle = '#fff';
-    context.fillRect(0, 0, canvas_side, canvas_side);
+    //context.fillStyle = '#fff';
+    //context.fillRect(0, 0, canvas_side, canvas_side);
     context.restore();
 }
 
