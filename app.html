@@ -85,7 +85,9 @@
           <div class="numberChoice btn-primary" data-number="9">9</div>
           <div class="numberChoice btn-primary" data-number="0">0</div>
         </div>
-        <div class="tile" style="margin-top:40px">
+      </div>
+      <div class="col-md-6">
+        <div class="ident" style="margin-top:40px">
           <p class="train-elements"> Cantidad de elementos entrenados: <span class="training-count">0</span></p>
           <button class="btn" id="returnTraining">
             <span class="input-icon fui-arrow-left"></span>
@@ -97,6 +99,19 @@
           </button>
           <button class="btn btn-primary" id="reset">Reiniciar entrenamiento</button>
           <button class="btn btn-success" id="stopTraining">Finalizar entrenamiento</button>
+        </div>
+        <div class="ident" style="margin-top:40px">
+          <textarea id="jsonOutput" class="form-control" rows="12" cols="10" style="margin-bottom:10px"></textarea>
+          <button class="btn btn-primary" id="saveNet">Guardar Red</button>
+          <button class="btn btn-success" id="loadNet">Cargar Red</button>
+        </div>
+        <div class="ident" style="margin-top:40px">
+          <div class="col-md-4" style="padding-left:0">
+            <input type="text" id="epochs" value="5000" placeholder="Epocas" class="form-control" />
+          </div>
+          <button class="btn btn-primary" id="autoTrain">Entrenar automaticamente</button>
+        </div>
+        <div class="ident" style="margin-top:40px">
         </div>
       </div>
     </div>
