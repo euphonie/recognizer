@@ -133,23 +133,30 @@
 
     $(function() {
 
-      canvas_side = 200;
+      window.canvas_side = 200;
+
+      window.trainingHash = {
+        '1':'1',
+        '2':'1',
+        '3':'2',
+        '4':'2',
+        '5':'3',
+      }
 
       // initialize training data
-
       window.trainingData = [];
 
       // Neural network
-      net = new brain.NeuralNetwork();
+      window.net = new brain.NeuralNetwork({
+        hiddenLayers: [10,10]
+      });
 
 
       // make references to the canvas objects for later
-
-      trainingCtx = $("#train")[0].getContext("2d");
-      testingCtx = $("#test")[0].getContext("2d");
+      window.trainingCtx = $("#train")[0].getContext("2d");
+      window.testingCtx = $("#test")[0].getContext("2d");
 
       // hiding the testing canvas until testing phase
-
       $("#test").hide();
 
       // initializing the canvas for training images
@@ -187,7 +194,7 @@
           var img = new Image();
           img.src = data;
           img.onload = function(){
-            trainingCtx.drawImage(img, 0, 0);
+            window.trainingCtx.drawImage(img, 0, 0);
           };
         });
       }
@@ -197,7 +204,7 @@
       // function for refreshing the canvas (should be called from addImageData)
 
       var canvasRefresh = function() {
-        trainingCtx.clearRect(0, 0, canvas_side, canvas_side);
+        window.trainingCtx.clearRect(0, 0, window.canvas_side, window.canvas_side);
         genRandomImage();
       }
 
@@ -205,9 +212,8 @@
 
       var addImageData = function(userInput) {
         var alphaData = [];
-        var imgData = trainingCtx.getImageData(0, 0, canvas_side, canvas_side).data;
+        var imgData = window.trainingCtx.getImageData(0, 0, window.canvas_side, window.canvas_side).data;
         // get every 4th value
-        dataimage = imgData;
         for(var i = 3; i < imgData.length; i += 4) {
           if(imgData[i] === 255) {
             alphaData.push(1); // add 1 to the alphaData array if pixel is black
@@ -216,24 +222,19 @@
             alphaData.push(0); // add 0 to the alphaData array if pixel is white
           }
           else {
-            console.log("Non-black-white character ignoring. Assuming white.");
+            //console.log("Non-black-white character ignoring. Assuming white.");
             alphaData.push(0);
           }
         }
-        parsedValue = {
+
+        var parsedValue = {
           '1':(1===parseInt(userInput) ? 1 : 0),
           '2':(2===parseInt(userInput) ? 1 : 0),
           '3':(3===parseInt(userInput) ? 1 : 0),
           '4':(4===parseInt(userInput) ? 1 : 0),
           '5':(5===parseInt(userInput) ? 1 : 0),
-          '6':(6===parseInt(userInput) ? 1 : 0),
-          '7':(7===parseInt(userInput) ? 1 : 0),
-          '8':(8===parseInt(userInput) ? 1 : 0),
-          '9':(9===parseInt(userInput) ? 1 : 0),
-          '0':(0===parseInt(userInput) ? 1 : 0)
         };
-        var ioHash = {input: alphaData, output: parsedValue};
-        window.trainingData.push(ioHash);
+        addToTraining(alphaData, parsedValue);
         canvasRefresh();
       }
 
@@ -264,14 +265,27 @@
 
       $("#stopTraining").click(function(){
         animateStop();
-        net.train(trainingData);
-      });
+        $.ajax({
+            url:'/train',
+            type:'POST',
+            processData: false,
+            contentType: 'application/json',
+            data: JSON.stringify({entrenamiento: window.trainingData, epochs: $('#epochs').val()}) ,
+            success: function(data){
+              console.log('sent training data');
+            }
+          });
+        });
 
       hideElement('#returnTraining, #clean, #identify');
 
+      addToTraining = function(_input, _output){
+        window.trainingData.push({input:_input, output:_output});
+      };
+
       $("#identify").click(function(){
         var alphaData = [];
-        var imgData = testingCtx.getImageData(0, 0, canvas_side, canvas_side).data;
+        var imgData = window.testingCtx.getImageData(0, 0, window.canvas_side, window.canvas_side).data;
         // get every 4th value
         for(var i = 3; i < imgData.length; i += 4) {
           if(imgData[i] === 255) {
@@ -281,13 +295,73 @@
             alphaData.push(0); // add 0 to the alphaData array if pixel is white
           }
           else {
-            console.log("Non-black-white character ignoring. Assuming white.");
+            //console.log("Non-black-white character ignoring. Assuming white.");
             alphaData.push(0);
           }
         }
-        var output = net.run(alphaData);
-        console.log(output);
+        //var output = window.net.run(alphaData);
+        //console.log(output);
+        $.post('/test', {prueba:alphaData} ,function(data){
+          console.log('sent testing data');
+          console.log(data);
+        });
       });
+
+      $('#saveNet').click(function(){
+        $.get('/getNet', function(data){
+          $('#jsonOutput').val(data);
+        });
+      });
+      $('#loadNet').click(function(){
+
+      });
+      $('#autoTrain').click(function(){
+        for (var filename in window.trainingHash){
+          imageLoad(filename);
+        }
+        return false;
+      });
+
+      function imageLoad(nombre){
+        $.get('/image/'+nombre, function(data){
+          var img = new Image();
+          img.src = data;
+          processImage(img,nombre);
+        });
+       }
+
+      processImage = function(img, nombre){
+        var userInput = window.trainingHash[nombre];
+        // a get request to "/random" should return a url to an image
+        var parsedValue = {
+          '1':(1===parseInt(userInput) ? 1 : 0),
+          '2':(2===parseInt(userInput) ? 1 : 0),
+          '3':(3===parseInt(userInput) ? 1 : 0),
+          '4':(4===parseInt(userInput) ? 1 : 0),
+          '5':(5===parseInt(userInput) ? 1 : 0),
+        };
+        img.onload = (function(outputData){
+          return function(){
+              window.trainingCtx.clearRect(0, 0, window.canvas_side, window.canvas_side);
+              window.trainingCtx.drawImage(img, 0, 0);
+              var alphaData = [];
+              var imgData = window.trainingCtx.getImageData(0, 0, window.canvas_side, window.canvas_side).data;
+              // get every 4th outputData
+              for(var i = 3; i < imgData.length; i += 4) {
+                if(imgData[i] === 255) {
+                  alphaData.push(1); // add 1 to the alphaData array if pixel is black
+                }
+                else if(imgData[i] === 0) {
+                  alphaData.push(0); // add 0 to the alphaData array if pixel is white
+                }
+                else {
+                  alphaData.push(0);
+                }
+              }
+              addToTraining(alphaData, outputData);
+            };
+          })(parsedValue);
+      }
 
       //var output = net.run({ r: 1, g: 0.4, b: 0 });  // { white: 0.99, black: 0.002 }
     });
