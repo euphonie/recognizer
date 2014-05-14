@@ -32,7 +32,7 @@ app.post('/train', function(req, res){
   var trainData = req.body.entrenamiento;
   var epochs = req.body.epochs;
   net.train(trainData, {
-    iterations:epochs,
+    iterations:500,
     callbackPeriod:1,
     callback:function(m){
       console.log(m);
@@ -43,7 +43,14 @@ app.post('/train', function(req, res){
 });
 
 app.get('/getNet', function(req, res){
-  res.end(JSON.stringify(net.toJSON()));
+  //res.setHeader('Content-Type', 'application/json');
+  //res.end(JSON.stringify(net.toJSON()));
+  res.setHeader('Content-type', 'text/plain');
+  res.setHeader('Content-disposition', 'attachment; filename=neural_net.txt');
+  res.setHeader('Content-Transfer-Encoding', 'binary');
+  res.charset = 'UTF-8';
+  res.write(JSON.stringify(net.toJSON()));
+  res.end();
 });
 
 app.post('/test', function(req, res){
@@ -54,7 +61,7 @@ app.post('/test', function(req, res){
 });
 
 app.get('/random', function(req, res) {
-  var fileNumber = Math.round(Math.random()*27) + 1;
+  var fileNumber = Math.round(Math.random()*14) + 1;
   fs.readFile('/images/'+fileNumber+'.png', function(data) {
     res.contentType('image/png');
     res.end('/images/'+fileNumber+'.png', 'binary');
