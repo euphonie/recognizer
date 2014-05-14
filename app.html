@@ -102,7 +102,7 @@
         </div>
         <div class="ident" style="margin-top:40px">
           <textarea id="jsonOutput" class="form-control" rows="12" cols="10" style="margin-bottom:10px"></textarea>
-          <button class="btn btn-primary" id="saveNet">Guardar Red</button>
+          <a class="btn btn-primary" id="saveNet" href="/getNet">Guardar Red</a>
           <button class="btn btn-success" id="loadNet">Cargar Red</button>
         </div>
         <div class="ident" style="margin-top:40px">
@@ -307,11 +307,6 @@
         });
       });
 
-      $('#saveNet').click(function(){
-        $.get('/getNet', function(data){
-          $('#jsonOutput').val(data);
-        });
-      });
       $('#loadNet').click(function(){
 
       });

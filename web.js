@@ -43,7 +43,8 @@ app.post('/train', function(req, res){
 });
 
 app.get('/getNet', function(req, res){
-  res.end(JSON.stringify(net.toJSON()));
+  res.attachment('neural_net.json');
+  res.end(JSON.stringify(net.toJSON(), null, 2), 'utf8');
 });
 
 app.post('/test', function(req, res){
