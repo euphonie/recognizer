@@ -43,14 +43,8 @@ app.post('/train', function(req, res){
 });
 
 app.get('/getNet', function(req, res){
-  //res.setHeader('Content-Type', 'application/json');
-  //res.end(JSON.stringify(net.toJSON()));
-  res.setHeader('Content-type', 'text/plain');
-  res.setHeader('Content-disposition', 'attachment; filename=neural_net.txt');
-  res.setHeader('Content-Transfer-Encoding', 'binary');
-  res.charset = 'UTF-8';
-  res.write(JSON.stringify(net.toJSON()));
-  res.end();
+  res.attachment('neural_net.json');
+  res.end(JSON.stringify(net.toJSON(), null, 2), 'utf8');
 });
 
 app.post('/test', function(req, res){
