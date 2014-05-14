@@ -15,7 +15,7 @@ var assert = require("assert"),
 
 //Neural network definition
 var net = new brain.NeuralNetwork({
-  hiddenLayers: [10,10],
+  hiddenLayers: [5, 5],
   momentum:0.7
 });
 
