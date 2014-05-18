@@ -11,18 +11,22 @@ var app = express();
 
 var assert = require("assert"),
     brain = require("brain"),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    multer  = require('multer');
 
 //Neural network definition
 var net = new brain.NeuralNetwork({
   hiddenLayers: [5, 5],
   momentum:0.7
 });
+var _error=0;
+var _iterations=0;
 
 app.engine('html', ejs.renderFile);
 app.set('views', __dirname);
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser({limit:'50mb'}));
+app.use(multer({ dest: './uploads/'}))
 
 app.get('/', function (req, res) {
   res.render('app.html');
@@ -31,15 +35,22 @@ app.get('/', function (req, res) {
 app.post('/train', function(req, res){
   var trainData = req.body.entrenamiento;
   var epochs = req.body.epochs;
+  _error = 0;
+  _iterations = 0;
   net.train(trainData, {
-    iterations:500,
+    iterations:epochs,
     callbackPeriod:1,
     callback:function(m){
       console.log(m);
-      console.log('end training');
+      _error = m.error;
+      _iterations = m.iterations;
       res.end('OK');
     }
   });
+});
+
+app.get('/checkNet', function(req, res){
+  res.end(JSON.stringify({'error':_error, 'iterations':_iterations}));
 });
 
 app.get('/getNet', function(req, res){
