@@ -156,6 +156,7 @@
     <script src="js/jquery.tagsinput.js"></script>
     <script src="js/jquery.placeholder.js"></script>
     <script src="js/brain-0.6.3.js"></script>
+    <script src="js/jquery.noty.packaged.js"></script>
     <script>
     // handwriting.js - training a neural network to recognize handwritten digits
     // (c) 2013 Amit Mizrahi
@@ -342,7 +343,33 @@
         }
         $.post('/test', {prueba:alphaData} ,function(data){
           console.log('sent testing data');
-          console.log(data);
+          probando = data;
+          var maxima = -1;
+          for (var key in data){
+            if (maxima == -1 || data[maxima] < data[key]){
+              maxima = key;
+            }
+          }
+          isAnswer1 = (maxima == 1)? '2em' : '1em';
+          isAnswer2 = (maxima == 2)? '2em' : '1em';
+          isAnswer3 = (maxima == 3)? '2em' : '1em';
+          isAnswer4 = (maxima == 4)? '2em' : '1em';
+          isAnswer5 = (maxima == 5)? '2em' : '1em';
+          var result =
+          '<div>'+
+            '<ul>'+
+              '<li style="font-size:'+(isAnswer1)+'">1 - '+Number((data["1"]).toFixed(3))+'</li>'+
+              '<li style="font-size:'+(isAnswer2)+'">2 - '+Number((data["2"]).toFixed(3))+'</li>'+
+              '<li style="font-size:'+(isAnswer3)+'">3 - '+Number((data["3"]).toFixed(3))+'</li>'+
+              '<li style="font-size:'+(isAnswer4)+'">4 - '+Number((data["4"]).toFixed(3))+'</li>'+
+              '<li style="font-size:'+(isAnswer5)+'">5 - '+Number((data["5"]).toFixed(3))+'</li>'+
+            '</ul>'+
+          '</div>'
+          n = $('.app-container').noty({
+            text: result,
+            type: 'information',
+            layout:'top'
+          });
         });
       });
 
