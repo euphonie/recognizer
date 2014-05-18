@@ -3469,7 +3469,7 @@ fieldset[disabled] .twitter-typeahead .tt-hint {
  * http://www.apache.org/licenses/LICENSE-2.0
  * ============================================================ */
 .has-switch {
-  border-radius: 30px;
+  border-radius: 16px;
   display: inline-block;
   cursor: pointer;
   line-height: 1.72222;
