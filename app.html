@@ -14,8 +14,50 @@
           height: 100%;
           background-color:#ECF0F1;
       }
+      .loadingpulse {
+        width: 24px;
+        height: 24px;
+
+
+      }
+      .loadingpulse:before {
+        display: block;
+
+        width: 16px;
+        height: 16px;
+        margin: 4px;
+
+        background-color: #ccc;
+
+        content: "";
+
+        animation: loadingpulse 1s ease infinite;
+        -webkit-animation: loadingpulse 1s ease infinite;
+        border-radius: 100%;
+      }
+      @keyframes loadingpulse {
+        to {
+          opacity: 0;
+
+          transform: scale( 2, 2 );
+          -ms-transform: scale(2, 2);
+          -webkit-transform: scale(2,2);
+        }
+      }
+      @-webkit-keyframes loadingpulse {
+        to {
+          opacity: 0;
+
+          transform: scale( 2, 2 );
+          -ms-transform: scale(2, 2);
+          -webkit-transform: scale(2,2);
+        }
+      }
       .pad-container {
         padding-top:5px;
+        float:left;
+        margin-bottom:0;
+        height:100%;
       }
       .app-container {
         width:100%;
