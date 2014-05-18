@@ -70,4 +70,22 @@ app.get('/image/:fileNumber', function(req, res) {
   });
 });
 
-app.listen(3000);
+app.post('/file-upload', function(req, res, next) {
+  var neural_network;
+  // First I want to read the file
+  fs.readFile(req.files.jsonFile.path, function read(err, data) {
+    if (err) {
+      throw err;
+    }
+    //neural_network = data;
+    if (Buffer.isBuffer( data)){
+      neural_network = data.toString('utf8');
+      net.fromJSON(JSON.parse(neural_network));
+      res.end(JSON.stringify({'status':'success','message':'Red interpretada.'}));
+    }else{
+      res.end(JSON.stringify({'status':'error','message':'Archivo de formato no permitido.'}));
+    }
+  });
+});
+
+app.listen(3000)
