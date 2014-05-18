@@ -139,8 +139,7 @@
           <canvas class="btn-info no-padding center-block" id="test" width="200" height="200"></canvas>
         </div>
         <div class="">
-          <button class="btn btn-primary col-md-2 col-md-offset-4" id="clean">Reset</button>
-          <button class="btn btn-primary col-md-2" id="random">Random</button>
+          <button class="btn btn-primary col-md-4 col-md-offset-4" id="random">Random</button>
         </div>
         <label class="manual-train btn-block" style="text-align:center">Entrenar manualmente:</label>
         <div class="digit-container" style="padding-top:20px">
@@ -161,6 +160,7 @@
       </div>
       <div class="col-md-6">
         <h3>Opciones</h3>
+        <input type="checkbox" data-toggle="switch" name="format-switch" checked>
         <div class="ident automatic-train" style="margin-top:40px">
           <div class="col-md-4" style="padding-left:0">
             <input type="text" id="epochs" value="5000" placeholder="Epocas" class="form-control" />
@@ -210,6 +210,11 @@
 
     $(function() {
 
+      $("[data-toggle='switch']").wrap('<div style="margin-left:10px" class="switch" />').parent().bootstrapSwitch();
+
+      // on = png; off = jpg
+      window.formatoImagen = $('input[name="format-switch"]').val();
+
       hideElement('#returnTraining, #clean, #identify, .persistenceBlock, #retrain, #random');
       window.canvas_side = 200;
 
@@ -219,6 +224,16 @@
         '3':'2',
         '4':'2',
         '5':'3',
+        '6':'3',
+        '7':'3',
+        '8':'4',
+        '9':'4',
+        '10':'5',
+        '11':'5',
+        '12':'1',
+        '13':'2',
+        '14':'4',
+        '15':'5'
       }
 
       // initialize training data
