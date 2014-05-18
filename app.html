@@ -495,28 +495,27 @@
         };
         img.onload = (function(outputData, uinput){
           return function(){
-              window.trainingCtx.clearRect(0, 0, window.canvas_side, window.canvas_side);
-              window.trainingCtx.drawImage(img, 0, 0);
-              var alphaData = [];
-              var imgData = window.trainingCtx.getImageData(0, 0, window.canvas_side, window.canvas_side).data;
-              // get every 4th outputData
-              for(var i = 3; i < imgData.length; i += 4) {
-                if(imgData[i] === 255) {
-                  alphaData.push(1); // add 1 to the alphaData array if pixel is black
-                }
-                else if(imgData[i] === 0) {
-                  alphaData.push(0); // add 0 to the alphaData array if pixel is white
-                }
-                else {
-                  alphaData.push(0);
-                }
+            window.trainingCtx.clearRect(0, 0, window.canvas_side, window.canvas_side);
+            window.trainingCtx.drawImage(img, 0, 0);
+            var alphaData = [];
+            var imgData = window.trainingCtx.getImageData(0, 0, window.canvas_side, window.canvas_side).data;
+            // get every 4th outputData
+            for(var i = 3; i < imgData.length; i += 4) {
+              if(imgData[i] === 255) {
+                alphaData.push(1); // add 1 to the alphaData array if pixel is black
               }
-              addToTraining(alphaData, outputData);
-            };
-          })(parsedValue, userInput);
+              else if(imgData[i] === 0) {
+                alphaData.push(0); // add 0 to the alphaData array if pixel is white
+              }
+              else {
+                alphaData.push(0);
+              }
+            }
+            addToTraining(alphaData, outputData);
+          };
+        })(parsedValue, userInput);
       }
     });
     </script>
-    <script src="js/freeDrawing.js"></script>
   </body>
 </html>
